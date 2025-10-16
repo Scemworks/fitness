@@ -37,41 +37,41 @@ def init_db():
     
     # Create WORKOUT_PLAN table
     c.execute('''CREATE TABLE IF NOT EXISTS WORKOUT_PLAN (
-        WORKOUT_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-        WORKOUT_NAME TEXT,
-        WORKOUT_DESCRIPTION TEXT,
-        INTENSITY TEXT,
-        TRAIN_ID INTEGER,
-        FOREIGN KEY (TRAIN_ID) REFERENCES TRAINER(TRAINER_ID)
+        Plan_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+        Plan_name TEXT,
+        Description TEXT,
+        Intensity_level TEXT,
+        Trainer_id INTEGER,
+        FOREIGN KEY (Trainer_id) REFERENCES TRAINER(TRAINER_ID)
     )''')
     
     # Create DIET_PLAN table
     c.execute('''CREATE TABLE IF NOT EXISTS DIET_PLAN (
-        DIETPLAN_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-        DIET_NAME TEXT,
-        DIET_DESCRIPTION TEXT,
-        TARGET_CALORIES INTEGER,
-        T_ID INTEGER,
-        FOREIGN KEY (T_ID) REFERENCES TRAINER(TRAINER_ID)
+        DietPlan_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        DietPlan_name TEXT,
+        Diet_Description TEXT,
+        Target_Calories INTEGER,
+        Trainer_id INTEGER,
+        FOREIGN KEY (Trainer_id) REFERENCES TRAINER(TRAINER_ID)
     )''')
     
     # Create MEMBERSHIP table
     c.execute('''CREATE TABLE IF NOT EXISTS MEMBERSHIP (
-        MEMBERSHIP_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-        MEMBERSHIP_TYPE TEXT,
-        START_DATE TEXT,
-        END_DATE TEXT,
-        PAYMENT_TYPE TEXT,
-        PAYMENT_AMOUNT REAL,
-        STATUS TEXT,
-        MEM_ID INTEGER,
-        DIET_ID INTEGER,
-        TR_ID INTEGER,
-        W_ID INTEGER,
-        FOREIGN KEY (MEM_ID) REFERENCES MEMBER(MEMBER_ID),
-        FOREIGN KEY (DIET_ID) REFERENCES DIET_PLAN(DIETPLAN_ID),
-        FOREIGN KEY (TR_ID) REFERENCES TRAINER(TRAINER_ID),
-        FOREIGN KEY (W_ID) REFERENCES WORKOUT_PLAN(WORKOUT_ID)
+        Membership_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        Membership_type TEXT,
+        Start_date TEXT,
+        End_date TEXT,
+        Payment_type TEXT,
+        Payment_amount REAL,
+        Status TEXT,
+        Member_id INTEGER,
+        DietPlan_id INTEGER,
+        Trainer_id INTEGER,
+        Plan_id INTEGER,
+        FOREIGN KEY (Member_id) REFERENCES MEMBER(MEMBER_ID),
+        FOREIGN KEY (DietPlan_id) REFERENCES DIET_PLAN(DietPlan_id),
+        FOREIGN KEY (Trainer_id) REFERENCES TRAINER(TRAINER_ID),
+        FOREIGN KEY (Plan_id) REFERENCES WORKOUT_PLAN(Plan_ID)
     )''')
     
     # Create MEMBER_VITALS table
@@ -189,12 +189,12 @@ def memberships():
     if request.method == 'POST':
         data = request.json
         c.execute('''INSERT INTO MEMBERSHIP 
-                     (MEMBERSHIP_TYPE, START_DATE, END_DATE, PAYMENT_TYPE, 
-                      PAYMENT_AMOUNT, STATUS, MEM_ID, DIET_ID, TR_ID, W_ID) 
+                     (Membership_type, Start_date, End_date, Payment_type, 
+                      Payment_amount, Status, Member_id, DietPlan_id, Trainer_id, Plan_id) 
                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
                   (data['membership_type'], data['start_date'], data['end_date'],
                    data['payment_type'], data['payment_amount'], data['status'],
-                   data['mem_id'], data.get('diet_id'), data.get('tr_id'), data.get('w_id')))
+                   data['member_id'], data.get('dietplan_id'), data.get('trainer_id'), data.get('plan_id')))
         conn.commit()
         membership_id = c.lastrowid
         conn.close()
@@ -203,13 +203,13 @@ def memberships():
     else:
         c.execute('''SELECT m.*, mem.NAME 
                      FROM MEMBERSHIP m 
-                     LEFT JOIN MEMBER mem ON m.MEM_ID = mem.MEMBER_ID''')
+                     LEFT JOIN MEMBER mem ON m.Member_id = mem.MEMBER_ID''')
         memberships = c.fetchall()
         conn.close()
         return jsonify([{
             'membership_id': m[0], 'membership_type': m[1], 'start_date': m[2],
             'end_date': m[3], 'payment_type': m[4], 'payment_amount': m[5],
-            'status': m[6], 'mem_id': m[7], 'member_name': m[11]
+            'status': m[6], 'member_id': m[7], 'member_name': m[11]
         } for m in memberships])
 
 # WORKOUT PLAN CRUD Operations
@@ -221,24 +221,24 @@ def workouts():
     if request.method == 'POST':
         data = request.json
         c.execute('''INSERT INTO WORKOUT_PLAN 
-                     (WORKOUT_NAME, WORKOUT_DESCRIPTION, INTENSITY, TRAIN_ID) 
+                     (Plan_name, Description, Intensity_level, Trainer_id) 
                      VALUES (?, ?, ?, ?)''',
-                  (data['workout_name'], data['workout_description'], 
-                   data['intensity'], data.get('train_id')))
+                  (data['plan_name'], data['description'], 
+                   data['intensity_level'], data.get('trainer_id')))
         conn.commit()
-        workout_id = c.lastrowid
+        plan_id = c.lastrowid
         conn.close()
-        return jsonify({'message': 'Workout plan added successfully', 'workout_id': workout_id}), 201
+        return jsonify({'message': 'Workout plan added successfully', 'plan_id': plan_id}), 201
     
     else:
         c.execute('''SELECT w.*, t.NAME 
                      FROM WORKOUT_PLAN w 
-                     LEFT JOIN TRAINER t ON w.TRAIN_ID = t.TRAINER_ID''')
+                     LEFT JOIN TRAINER t ON w.Trainer_id = t.TRAINER_ID''')
         workouts = c.fetchall()
         conn.close()
         return jsonify([{
-            'workout_id': w[0], 'workout_name': w[1], 'workout_description': w[2],
-            'intensity': w[3], 'train_id': w[4], 'trainer_name': w[5]
+            'plan_id': w[0], 'plan_name': w[1], 'description': w[2],
+            'intensity_level': w[3], 'trainer_id': w[4], 'trainer_name': w[5]
         } for w in workouts])
 
 # DIET PLAN CRUD Operations
@@ -250,24 +250,24 @@ def diets():
     if request.method == 'POST':
         data = request.json
         c.execute('''INSERT INTO DIET_PLAN 
-                     (DIET_NAME, DIET_DESCRIPTION, TARGET_CALORIES, T_ID) 
+                     (DietPlan_name, Diet_Description, Target_Calories, Trainer_id) 
                      VALUES (?, ?, ?, ?)''',
-                  (data['diet_name'], data['diet_description'], 
-                   data['target_calories'], data.get('t_id')))
+                  (data['dietplan_name'], data['diet_description'], 
+                   data['target_calories'], data.get('trainer_id')))
         conn.commit()
-        diet_id = c.lastrowid
+        dietplan_id = c.lastrowid
         conn.close()
-        return jsonify({'message': 'Diet plan added successfully', 'diet_id': diet_id}), 201
+        return jsonify({'message': 'Diet plan added successfully', 'dietplan_id': dietplan_id}), 201
     
     else:
         c.execute('''SELECT d.*, t.NAME 
                      FROM DIET_PLAN d 
-                     LEFT JOIN TRAINER t ON d.T_ID = t.TRAINER_ID''')
+                     LEFT JOIN TRAINER t ON d.Trainer_id = t.TRAINER_ID''')
         diets = c.fetchall()
         conn.close()
         return jsonify([{
-            'diet_id': d[0], 'diet_name': d[1], 'diet_description': d[2],
-            'target_calories': d[3], 't_id': d[4], 'trainer_name': d[5]
+            'dietplan_id': d[0], 'dietplan_name': d[1], 'diet_description': d[2],
+            'target_calories': d[3], 'trainer_id': d[4], 'trainer_name': d[5]
         } for d in diets])
 
 # MEMBER VITALS Operations

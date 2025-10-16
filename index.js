@@ -219,7 +219,7 @@ document.getElementById('membershipForm').addEventListener('submit', async (e) =
         payment_type: document.getElementById('membershipPayment').value,
         payment_amount: parseFloat(document.getElementById('membershipAmount').value),
         status: document.getElementById('membershipStatus').value,
-        mem_id: parseInt(document.getElementById('membershipMember').value)
+        member_id: parseInt(document.getElementById('membershipMember').value)
     };
     
     try {
@@ -271,10 +271,10 @@ document.getElementById('workoutForm').addEventListener('submit', async (e) => {
     const trainerId = document.getElementById('workoutTrainer').value;
     
     const data = {
-        workout_name: document.getElementById('workoutName').value,
-        workout_description: document.getElementById('workoutDesc').value,
-        intensity: document.getElementById('workoutIntensity').value,
-        train_id: trainerId ? parseInt(trainerId) : null
+        plan_name: document.getElementById('workoutName').value,
+        description: document.getElementById('workoutDesc').value,
+        intensity_level: document.getElementById('workoutIntensity').value,
+        trainer_id: trainerId ? parseInt(trainerId) : null
     };
     
     try {
@@ -305,10 +305,10 @@ async function loadWorkouts() {
         workouts.forEach(workout => {
             const row = tbody.insertRow();
             row.innerHTML = `
-                <td>${workout.workout_id}</td>
-                <td>${workout.workout_name}</td>
-                <td>${workout.workout_description || '-'}</td>
-                <td>${workout.intensity}</td>
+                <td>${workout.plan_id}</td>
+                <td>${workout.plan_name}</td>
+                <td>${workout.description || '-'}</td>
+                <td>${workout.intensity_level}</td>
                 <td>${workout.trainer_name || 'N/A'}</td>
             `;
         });
@@ -324,10 +324,10 @@ document.getElementById('dietForm').addEventListener('submit', async (e) => {
     const trainerId = document.getElementById('dietTrainer').value;
     
     const data = {
-        diet_name: document.getElementById('dietName').value,
+        dietplan_name: document.getElementById('dietName').value,
         diet_description: document.getElementById('dietDesc').value,
         target_calories: parseInt(document.getElementById('dietCalories').value),
-        t_id: trainerId ? parseInt(trainerId) : null
+        trainer_id: trainerId ? parseInt(trainerId) : null
     };
     
     try {
@@ -358,8 +358,8 @@ async function loadDiets() {
         diets.forEach(diet => {
             const row = tbody.insertRow();
             row.innerHTML = `
-                <td>${diet.diet_id}</td>
-                <td>${diet.diet_name}</td>
+                <td>${diet.dietplan_id}</td>
+                <td>${diet.dietplan_name}</td>
                 <td>${diet.diet_description || '-'}</td>
                 <td>${diet.target_calories}</td>
                 <td>${diet.trainer_name || 'N/A'}</td>
