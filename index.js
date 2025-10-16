@@ -90,7 +90,7 @@ async function loadMembers() {
 }
 
 async function deleteMember(id) {
-    if (!confirm('Are you sure you want to delete this member?')) return;
+    if (!confirm('Are you sure you want to delete this member? This will also delete all their memberships and vitals records.')) return;
     
     try {
         const response = await fetch(`${API_URL}/members/${id}`, {
@@ -98,8 +98,10 @@ async function deleteMember(id) {
         });
         
         if (response.ok) {
-            showAlert('Member deleted successfully!', 'success');
+            showAlert('Member and all related records deleted successfully!', 'success');
             loadMembers();
+            loadMemberships(); // Refresh memberships as they might reference deleted member
+            loadVitals(); // Refresh vitals as they might reference deleted member
         }
     } catch (error) {
         showAlert('Error deleting member', 'error');
@@ -176,7 +178,7 @@ async function loadTrainers() {
 }
 
 async function deleteTrainer(id) {
-    if (!confirm('Are you sure you want to delete this trainer?')) return;
+    if (!confirm('Are you sure you want to delete this trainer? This will remove trainer assignments from related plans and memberships.')) return;
     
     try {
         const response = await fetch(`${API_URL}/trainers/${id}`, {
@@ -184,8 +186,11 @@ async function deleteTrainer(id) {
         });
         
         if (response.ok) {
-            showAlert('Trainer deleted successfully!', 'success');
+            showAlert('Trainer deleted successfully and references updated!', 'success');
             loadTrainers();
+            loadMemberships(); // Refresh memberships as they might reference deleted trainer
+            loadWorkouts(); // Refresh workouts as they might reference deleted trainer
+            loadDiets(); // Refresh diets as they might reference deleted trainer
         }
     } catch (error) {
         showAlert('Error deleting trainer', 'error');
@@ -257,10 +262,30 @@ async function loadMemberships() {
                 <td>${membership.end_date}</td>
                 <td>₹${membership.payment_amount}</td>
                 <td><span class="status-${membership.status.toLowerCase()}">${membership.status}</span></td>
+                <td>
+                    <button class="btn btn-delete" onclick="deleteMembership(${membership.membership_id})">Delete</button>
+                </td>
             `;
         });
     } catch (error) {
         console.error('Error loading memberships:', error);
+    }
+}
+
+async function deleteMembership(id) {
+    if (!confirm('Are you sure you want to delete this membership?')) return;
+    
+    try {
+        const response = await fetch(`${API_URL}/memberships/${id}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            showAlert('Membership deleted successfully!', 'success');
+            loadMemberships();
+        }
+    } catch (error) {
+        showAlert('Error deleting membership', 'error');
     }
 }
 
@@ -310,10 +335,31 @@ async function loadWorkouts() {
                 <td>${workout.description || '-'}</td>
                 <td>${workout.intensity_level}</td>
                 <td>${workout.trainer_name || 'N/A'}</td>
+                <td>
+                    <button class="btn btn-delete" onclick="deleteWorkout(${workout.plan_id})">Delete</button>
+                </td>
             `;
         });
     } catch (error) {
         console.error('Error loading workouts:', error);
+    }
+}
+
+async function deleteWorkout(id) {
+    if (!confirm('Are you sure you want to delete this workout plan? This will remove the plan from any associated memberships.')) return;
+    
+    try {
+        const response = await fetch(`${API_URL}/workouts/${id}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            showAlert('Workout plan deleted successfully!', 'success');
+            loadWorkouts();
+            loadMemberships(); // Refresh memberships as they might reference deleted workout plan
+        }
+    } catch (error) {
+        showAlert('Error deleting workout plan', 'error');
     }
 }
 
@@ -363,10 +409,31 @@ async function loadDiets() {
                 <td>${diet.diet_description || '-'}</td>
                 <td>${diet.target_calories}</td>
                 <td>${diet.trainer_name || 'N/A'}</td>
+                <td>
+                    <button class="btn btn-delete" onclick="deleteDiet(${diet.dietplan_id})">Delete</button>
+                </td>
             `;
         });
     } catch (error) {
         console.error('Error loading diets:', error);
+    }
+}
+
+async function deleteDiet(id) {
+    if (!confirm('Are you sure you want to delete this diet plan? This will remove the plan from any associated memberships.')) return;
+    
+    try {
+        const response = await fetch(`${API_URL}/diets/${id}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            showAlert('Diet plan deleted successfully!', 'success');
+            loadDiets();
+            loadMemberships(); // Refresh memberships as they might reference deleted diet plan
+        }
+    } catch (error) {
+        showAlert('Error deleting diet plan', 'error');
     }
 }
 
@@ -414,10 +481,30 @@ async function loadVitals() {
                 <td>${vital.weight} kg</td>
                 <td>${vital.height} cm</td>
                 <td>${vital.record_date}</td>
+                <td>
+                    <button class="btn btn-delete" onclick="deleteVitals(${vital.vitals_id})">Delete</button>
+                </td>
             `;
         });
     } catch (error) {
         console.error('Error loading vitals:', error);
+    }
+}
+
+async function deleteVitals(id) {
+    if (!confirm('Are you sure you want to delete this vitals record?')) return;
+    
+    try {
+        const response = await fetch(`${API_URL}/vitals/${id}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            showAlert('Vitals record deleted successfully!', 'success');
+            loadVitals();
+        }
+    } catch (error) {
+        showAlert('Error deleting vitals record', 'error');
     }
 }
 

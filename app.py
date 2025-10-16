@@ -133,10 +133,14 @@ def member_detail(id):
         return jsonify({'message': 'Member updated successfully'})
     
     elif request.method == 'DELETE':
+        # Cascading delete: Remove all related records first
+        c.execute('DELETE FROM MEMBER_VITALS WHERE MEMB_ID=?', (id,))
+        c.execute('DELETE FROM MEMBERSHIP WHERE Member_id=?', (id,))
+        c.execute('DELETE FROM MEMBER_PHONE WHERE MEMBER_ID=?', (id,))
         c.execute('DELETE FROM MEMBER WHERE MEMBER_ID=?', (id,))
         conn.commit()
         conn.close()
-        return jsonify({'message': 'Member deleted successfully'})
+        return jsonify({'message': 'Member and all related records deleted successfully'})
 
 # TRAINER CRUD Operations
 @app.route('/api/trainers', methods=['GET', 'POST'])
@@ -175,10 +179,15 @@ def trainer_detail(id):
         return jsonify({'message': 'Trainer updated successfully'})
     
     elif request.method == 'DELETE':
+        # Cascading delete: Remove all related records first
+        # Set trainer_id to NULL in related tables instead of deleting the records
+        c.execute('UPDATE MEMBERSHIP SET Trainer_id=NULL WHERE Trainer_id=?', (id,))
+        c.execute('UPDATE WORKOUT_PLAN SET Trainer_id=NULL WHERE Trainer_id=?', (id,))
+        c.execute('UPDATE DIET_PLAN SET Trainer_id=NULL WHERE Trainer_id=?', (id,))
         c.execute('DELETE FROM TRAINER WHERE TRAINER_ID=?', (id,))
         conn.commit()
         conn.close()
-        return jsonify({'message': 'Trainer deleted successfully'})
+        return jsonify({'message': 'Trainer deleted successfully and references updated'})
 
 # MEMBERSHIP CRUD Operations
 @app.route('/api/memberships', methods=['GET', 'POST'])
@@ -212,6 +221,15 @@ def memberships():
             'status': m[6], 'member_id': m[7], 'member_name': m[11]
         } for m in memberships])
 
+@app.route('/api/memberships/<int:id>', methods=['DELETE'])
+def delete_membership(id):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('DELETE FROM MEMBERSHIP WHERE Membership_id=?', (id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'message': 'Membership deleted successfully'})
+
 # WORKOUT PLAN CRUD Operations
 @app.route('/api/workouts', methods=['GET', 'POST'])
 def workouts():
@@ -240,6 +258,17 @@ def workouts():
             'plan_id': w[0], 'plan_name': w[1], 'description': w[2],
             'intensity_level': w[3], 'trainer_id': w[4], 'trainer_name': w[5]
         } for w in workouts])
+
+@app.route('/api/workouts/<int:id>', methods=['DELETE'])
+def delete_workout(id):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    # First remove references in MEMBERSHIP table
+    c.execute('UPDATE MEMBERSHIP SET Plan_id=NULL WHERE Plan_id=?', (id,))
+    c.execute('DELETE FROM WORKOUT_PLAN WHERE Plan_ID=?', (id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'message': 'Workout plan deleted successfully'})
 
 # DIET PLAN CRUD Operations
 @app.route('/api/diets', methods=['GET', 'POST'])
@@ -270,6 +299,17 @@ def diets():
             'target_calories': d[3], 'trainer_id': d[4], 'trainer_name': d[5]
         } for d in diets])
 
+@app.route('/api/diets/<int:id>', methods=['DELETE'])
+def delete_diet(id):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    # First remove references in MEMBERSHIP table
+    c.execute('UPDATE MEMBERSHIP SET DietPlan_id=NULL WHERE DietPlan_id=?', (id,))
+    c.execute('DELETE FROM DIET_PLAN WHERE DietPlan_id=?', (id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'message': 'Diet plan deleted successfully'})
+
 # MEMBER VITALS Operations
 @app.route('/api/vitals', methods=['GET', 'POST'])
 def vitals():
@@ -297,6 +337,15 @@ def vitals():
             'vitals_id': v[0], 'weight': v[1], 'height': v[2],
             'record_date': v[3], 'memb_id': v[4], 'member_name': v[5]
         } for v in vitals])
+
+@app.route('/api/vitals/<int:id>', methods=['DELETE'])
+def delete_vitals(id):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('DELETE FROM MEMBER_VITALS WHERE VITALS_ID=?', (id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'message': 'Vitals record deleted successfully'})
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
