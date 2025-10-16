@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gym Management System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💪 Gym Management System</h1>
+            <p>Manage Members, Trainers, and Memberships</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" onclick="showTab('members')">Members</button>
+            <button class="tab-btn" onclick="showTab('trainers')">Trainers</button>
+            <button class="tab-btn" onclick="showTab('memberships')">Memberships</button>
+            <button class="tab-btn" onclick="showTab('workouts')">Workouts</button>
+            <button class="tab-btn" onclick="showTab('diets')">Diet Plans</button>
+            <button class="tab-btn" onclick="showTab('vitals')">Vitals</button>
+        </nav>
+
+        <!-- MEMBERS TAB -->
+        <div id="members" class="tab-content active">
+            <h2>Member Management</h2>
+            <form id="memberForm" class="form-card">
+                <div class="form-group">
+                    <label>Name:</label>
+                    <input type="text" id="memberName" required>
+                </div>
+                <div class="form-group">
+                    <label>Date of Birth:</label>
+                    <input type="date" id="memberDOB">
+                </div>
+                <div class="form-group">
+                    <label>Join Date:</label>
+                    <input type="date" id="memberJoinDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="memberEmail">
+                </div>
+                <button type="submit" class="btn">Add Member</button>
+            </form>
+            
+            <div class="table-container">
+                <h3>All Members</h3>
+                <table id="membersTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>DOB</th>
+                            <th>Join Date</th>
+                            <th>Email</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TRAINERS TAB -->
+        <div id="trainers" class="tab-content">
+            <h2>Trainer Management</h2>
+            <form id="trainerForm" class="form-card">
+                <div class="form-group">
+                    <label>Name:</label>
+                    <input type="text" id="trainerName" required>
+                </div>
+                <div class="form-group">
+                    <label>Specialisation:</label>
+                    <input type="text" id="trainerSpec" placeholder="e.g., Yoga, Cardio, Strength">
+                </div>
+                <button type="submit" class="btn">Add Trainer</button>
+            </form>
+            
+            <div class="table-container">
+                <h3>All Trainers</h3>
+                <table id="trainersTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Specialisation</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- MEMBERSHIPS TAB -->
+        <div id="memberships" class="tab-content">
+            <h2>Membership Management</h2>
+            <form id="membershipForm" class="form-card">
+                <div class="form-group">
+                    <label>Member:</label>
+                    <select id="membershipMember" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Type:</label>
+                    <select id="membershipType">
+                        <option>Monthly</option>
+                        <option>Quarterly</option>
+                        <option>Yearly</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Start Date:</label>
+                    <input type="date" id="membershipStart" required>
+                </div>
+                <div class="form-group">
+                    <label>End Date:</label>
+                    <input type="date" id="membershipEnd" required>
+                </div>
+                <div class="form-group">
+                    <label>Payment Type:</label>
+                    <select id="membershipPayment">
+                        <option>Cash</option>
+                        <option>Card</option>
+                        <option>UPI</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Amount:</label>
+                    <input type="number" id="membershipAmount" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Status:</label>
+                    <select id="membershipStatus">
+                        <option>Active</option>
+                        <option>Inactive</option>
+                        <option>Expired</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">Add Membership</button>
+            </form>
+            
+            <div class="table-container">
+                <h3>All Memberships</h3>
+                <table id="membershipsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Member</th>
+                            <th>Type</th>
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- WORKOUTS TAB -->
+        <div id="workouts" class="tab-content">
+            <h2>Workout Plans</h2>
+            <form id="workoutForm" class="form-card">
+                <div class="form-group">
+                    <label>Workout Name:</label>
+                    <input type="text" id="workoutName" required>
+                </div>
+                <div class="form-group">
+                    <label>Description:</label>
+                    <textarea id="workoutDesc" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Intensity:</label>
+                    <select id="workoutIntensity">
+                        <option>Low</option>
+                        <option>Medium</option>
+                        <option>High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Trainer:</label>
+                    <select id="workoutTrainer"></select>
+                </div>
+                <button type="submit" class="btn">Add Workout Plan</button>
+            </form>
+            
+            <div class="table-container">
+                <h3>All Workout Plans</h3>
+                <table id="workoutsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Intensity</th>
+                            <th>Trainer</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- DIET PLANS TAB -->
+        <div id="diets" class="tab-content">
+            <h2>Diet Plans</h2>
+            <form id="dietForm" class="form-card">
+                <div class="form-group">
+                    <label>Diet Name:</label>
+                    <input type="text" id="dietName" required>
+                </div>
+                <div class="form-group">
+                    <label>Description:</label>
+                    <textarea id="dietDesc" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Target Calories:</label>
+                    <input type="number" id="dietCalories">
+                </div>
+                <div class="form-group">
+                    <label>Trainer:</label>
+                    <select id="dietTrainer"></select>
+                </div>
+                <button type="submit" class="btn">Add Diet Plan</button>
+            </form>
+            
+            <div class="table-container">
+                <h3>All Diet Plans</h3>
+                <table id="dietsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Calories</th>
+                            <th>Trainer</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- VITALS TAB -->
+        <div id="vitals" class="tab-content">
+            <h2>Member Vitals</h2>
+            <form id="vitalsForm" class="form-card">
+                <div class="form-group">
+                    <label>Member:</label>
+                    <select id="vitalsMember" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Weight (kg):</label>
+                    <input type="number" id="vitalsWeight" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label>Height (cm):</label>
+                    <input type="number" id="vitalsHeight" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label>Record Date:</label>
+                    <input type="date" id="vitalsDate" required>
+                </div>
+                <button type="submit" class="btn">Record Vitals</button>
+            </form>
+            
+            <div class="table-container">
+                <h3>All Vital Records</h3>
+                <table id="vitalsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Member</th>
+                            <th>Weight</th>
+                            <th>Height</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="index.js"></script>
+</body>
+</html>
